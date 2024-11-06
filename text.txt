@@ -1,0 +1,43 @@
+import imaplib
+
+def extract_spam_emails(username, password, server):
+    # Connect to the IMAP server
+    mail = imaplib.IMAP4_SSL(server)
+
+    # Login to the email account
+    mail.login(username, password)
+
+    # Select the spam folder
+    mail.select("Spam")
+
+    # Search for all spam emails
+    _, message_ids = mail.search(None, "ALL")
+
+    spam_bodies = []  # Array to store spam mail bodies
+
+    # Iterate over each email message
+    for message_id in message_ids[0].split():
+        _, data = mail.fetch(message_id, "(RFC822)")  # Fetch the email message
+
+        # Parse the message data
+        for response_part in data:
+            if isinstance(response_part, tuple):
+                email_body = response_part[1]  # Extract the email body
+                spam_bodies.append(email_body)  # Add the body to the array
+
+    # Close the connection
+    mail.close()
+    mail.logout()
+
+    return spam_bodies
+
+# Usage example
+username = "mohd.alhajj1913@gmail.com"
+password = "vmkjisitoxokmyeg"
+server = "imap.example.com"
+
+spam_emails = extract_spam_emails(username, password, "imaplib@gmail.com")
+
+# Print the spam email bodies
+for email_body in spam_emails:
+    print(email_body)
